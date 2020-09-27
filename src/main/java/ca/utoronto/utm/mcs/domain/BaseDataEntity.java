@@ -6,13 +6,13 @@ public class BaseDataEntity implements Serializable {
 
 	private static final long serialVersionUID = -3511212793126715779L;
 
-	public int id;
+	public String id;
 
-	public int getId() {
+	public String getId() {
 		return id;
 	}
 
-	public void setId(int id) {
+	public void setId(String id) {
 		this.id = id;
 	}
 	
