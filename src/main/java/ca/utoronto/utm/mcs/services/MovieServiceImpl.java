@@ -1,6 +1,7 @@
 package ca.utoronto.utm.mcs.services;
 
 import java.io.IOException;
+import java.util.Map;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -9,12 +10,11 @@ import com.sun.net.httpserver.HttpExchange;
 
 import ca.utoronto.utm.mcs.domain.Actor;
 import ca.utoronto.utm.mcs.exceptions.MissingInformationException;
-import ca.utoronto.utm.mcs.exceptions.NodeAlreadyExistsException;
 import ca.utoronto.utm.mcs.services.dao.ActorDAO;
 import ca.utoronto.utm.mcs.services.dao.ActorDAOService;
 import ca.utoronto.utm.mcs.services.dao.ActorDAOServiceImpl;
 
-public class ActorServiceImpl implements ActorService {
+public class MovieServiceImpl implements ActorService {
 
 	ActorDAOService actorDAOService = new ActorDAOServiceImpl();
 
@@ -26,9 +26,8 @@ public class ActorServiceImpl implements ActorService {
 			} else if (r.getRequestMethod().equals("POST")) {
 				addActor(r);
 			}
-		} catch (MissingInformationException | JSONException  | NodeAlreadyExistsException e) {
+		} catch (MissingInformationException | JSONException e) {
 			r.sendResponseHeaders(400, -1);
-//			e.printStackTrace();
 		} catch (Exception e) {
 			e.printStackTrace();
 			r.sendResponseHeaders(500, -1);
@@ -39,10 +38,6 @@ public class ActorServiceImpl implements ActorService {
 	public void addActor(HttpExchange r) throws Exception {
 		Actor actor = mapBodyToActor(r);
 		//Check if exists
-		ActorDAO actorDAO = actorDAOService.getActor(actor.getId());
-		if (actorDAO != null) {
-			throw new NodeAlreadyExistsException("An actor with the same ID already exists");
-		}
 		if (actor.getPrimaryName() != null && actor.getId() != null) {
 			actorDAOService.addActor(actor.getPrimaryName(), actor.getId());
 		} else {

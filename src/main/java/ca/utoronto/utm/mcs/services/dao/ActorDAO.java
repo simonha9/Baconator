@@ -1,11 +1,12 @@
 package ca.utoronto.utm.mcs.services.dao;
 
-import ca.utoronto.utm.mcs.services.db.Neo4jActorMovies;
+import java.util.List;
 
 public class ActorDAO {
 
 	public String name;
 	public String actorID;
+	public List<String> movies;
 	
 	public ActorDAO(String name, String actorID) {
 		super();
@@ -33,4 +34,13 @@ public class ActorDAO {
 	public void setActorID(String actorID) {
 		this.actorID = actorID;
 	}
+
+	public List<String> getMovies() {
+		return movies;
+	}
+
+	public void setMovies(List<String> movies) {
+		this.movies = movies;
+	}
+	
 }

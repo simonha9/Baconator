@@ -16,7 +16,12 @@ public class App
         HttpServer server = HttpServer.create(new InetSocketAddress("0.0.0.0", PORT), 0);
         server.start();
         System.out.printf("Server started on port %d...\n", PORT);
-        ActorService actorService = new ActorServiceImpl();
-        server.createContext("/api/v1/addActor", actorService);
+        createContexts(server);
+    }
+    
+    private static void createContexts(HttpServer server) {
+    	ActorService actorService = new ActorServiceImpl();
+    	server.createContext("/api/v1/addActor", actorService);
+    	server.createContext("/api/v1/getActor", actorService);
     }
 }
