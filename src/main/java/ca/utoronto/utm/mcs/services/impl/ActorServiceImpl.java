@@ -1,4 +1,4 @@
-package ca.utoronto.utm.mcs.services;
+package ca.utoronto.utm.mcs.services.impl;
 
 import java.io.IOException;
 
@@ -10,9 +10,11 @@ import com.sun.net.httpserver.HttpExchange;
 import ca.utoronto.utm.mcs.domain.Actor;
 import ca.utoronto.utm.mcs.exceptions.MissingInformationException;
 import ca.utoronto.utm.mcs.exceptions.NodeAlreadyExistsException;
+import ca.utoronto.utm.mcs.services.ActorService;
+import ca.utoronto.utm.mcs.services.Utils;
 import ca.utoronto.utm.mcs.services.dao.ActorDAO;
 import ca.utoronto.utm.mcs.services.dao.ActorDAOService;
-import ca.utoronto.utm.mcs.services.dao.ActorDAOServiceImpl;
+import ca.utoronto.utm.mcs.services.dao.impl.ActorDAOServiceImpl;
 
 public class ActorServiceImpl implements ActorService {
 

@@ -11,6 +11,7 @@ import org.neo4j.driver.Transaction;
 import org.neo4j.driver.TransactionWork;
 
 import ca.utoronto.utm.mcs.services.dao.ActorDAO;
+import ca.utoronto.utm.mcs.services.dao.MovieDAO;
 
 public class Neo4jActorMovies {
 
@@ -26,33 +27,30 @@ public class Neo4jActorMovies {
 		driver.close();
 	}
 
-	public Boolean insertActor(ActorDAO actor) {
+	public ActorDAO insertActor(ActorDAO actor) {
 		try (Session session = driver.session()) {
-			session.writeTransaction(tx -> tx.run("MERGE (a:Actor {name: $name, id: $actorID})",
+			session.writeTransaction(tx -> tx.run("MERGE (a:actor {name: $name, id: $actorID})",
 					parameters("name", actor.getName(), "actorID", actor.getActorID())));
 			session.close();
-			return !session.isOpen();
+			return actor;
 		}
 	}
 
 	public ActorDAO getActor(String actorID) {
 		ActorDAO actor = null;
 		try (Session session = driver.session()) {
-			
-			String name = session.writeTransaction( new TransactionWork<String>()
-            {
-                @Override
-                public String execute( Transaction tx )
-                {
-                    Result result = tx.run("MATCH (a: Actor) " + "WHERE a.id = $actorID" + " RETURN a.name as name",
+			String name = session.writeTransaction(new TransactionWork<String>() {
+				@Override
+				public String execute(Transaction tx) {
+					Result result = tx.run("MATCH (a: actor) " + "WHERE a.id = $actorID" + " RETURN a.name as name",
 							parameters("actorID", actorID));
-                    
-                    if (result.hasNext()) {
-                    	return result.single().get("name", "");
-                    }
-                    return null;
-                }
-            } );
+
+					if (result.hasNext()) {
+						return result.single().get("name", "");
+					}
+					return null;
+				}
+			});
 			if (name != null) {
 				actor = new ActorDAO();
 				actor.setName(name);
@@ -61,6 +59,15 @@ public class Neo4jActorMovies {
 				return actor;
 			}
 			return null;
+		}
+	}
+
+	public MovieDAO insertMovie(MovieDAO movie) {
+		try (Session session = driver.session()) {
+			session.writeTransaction(tx -> tx.run("MERGE (m:movie {name: $name, id: $movieID})",
+					parameters("name", movie.getMovieName(), "movieID", movie.getMovieID())));
+			session.close();
+			return movie;
 		}
 	}
 }

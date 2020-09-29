@@ -1,6 +1,8 @@
-package ca.utoronto.utm.mcs.services.dao;
+package ca.utoronto.utm.mcs.services.dao.impl;
 
 import ca.utoronto.utm.mcs.domain.Actor;
+import ca.utoronto.utm.mcs.services.dao.ActorDAO;
+import ca.utoronto.utm.mcs.services.dao.ActorDAOService;
 import ca.utoronto.utm.mcs.services.db.Neo4jActorMovies;
 
 public class ActorDAOServiceImpl implements ActorDAOService {

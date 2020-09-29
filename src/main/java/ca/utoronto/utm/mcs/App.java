@@ -6,7 +6,9 @@ import java.net.InetSocketAddress;
 import com.sun.net.httpserver.HttpServer;
 
 import ca.utoronto.utm.mcs.services.ActorService;
-import ca.utoronto.utm.mcs.services.ActorServiceImpl;
+import ca.utoronto.utm.mcs.services.MovieService;
+import ca.utoronto.utm.mcs.services.impl.ActorServiceImpl;
+import ca.utoronto.utm.mcs.services.impl.MovieServiceImpl;
 
 public class App 
 {
@@ -23,5 +25,9 @@ public class App
     	ActorService actorService = new ActorServiceImpl();
     	server.createContext("/api/v1/addActor", actorService);
     	server.createContext("/api/v1/getActor", actorService);
+    	
+    	MovieService movieService = new MovieServiceImpl();
+    	server.createContext("/api/v1/addMovie", movieService);
+    	server.createContext("/api/v1/getMovie", movieService);
     }
 }
