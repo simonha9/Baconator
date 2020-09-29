@@ -1,12 +1,11 @@
 package ca.utoronto.utm.mcs.services;
 
-import com.sun.net.httpserver.HttpHandler;
-import com.sun.net.httpserver.HttpExchange;
+import ca.utoronto.utm.mcs.domain.Actor;
 
-public interface ActorService extends HttpHandler{
+public interface ActorService {
 
-	public void addActor(HttpExchange r) throws Exception;
-	public void getActor(HttpExchange r) throws Exception;
-	public void computeBaconNumber(HttpExchange r) throws Exception;
-	public void computeBaconPath(HttpExchange r) throws Exception;
+	public String addActor(Actor actor) throws Exception;
+	public Actor getActor(String actorId) throws Exception;
+	public void computeBaconNumber() throws Exception;
+	public void computeBaconPath() throws Exception;
 }
