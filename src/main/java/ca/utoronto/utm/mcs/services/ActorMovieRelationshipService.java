@@ -1,10 +1,8 @@
 package ca.utoronto.utm.mcs.services;
 
-import com.sun.net.httpserver.HttpHandler;
-import com.sun.net.httpserver.HttpExchange;
+import ca.utoronto.utm.mcs.domain.ActorMovieRelationship;
 
-public interface ActorMovieRelationshipService extends HttpHandler{
+public interface ActorMovieRelationshipService {
 
-	public void addRelationship(HttpExchange r) throws Exception;
-	public void getRelationship(HttpExchange r) throws Exception;
+	public ActorMovieRelationship addRelationship(ActorMovieRelationship relationship) throws Exception;
 }

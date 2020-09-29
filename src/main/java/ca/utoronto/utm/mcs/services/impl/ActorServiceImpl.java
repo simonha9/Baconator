@@ -11,6 +11,8 @@ public class ActorServiceImpl implements ActorService {
 
 	Driver driver;
 	
+	ActorDAO actorDAO = null;
+	
 	public ActorServiceImpl(Driver driver) {
 		this.driver = driver;
 	}
@@ -29,7 +31,7 @@ public class ActorServiceImpl implements ActorService {
 
 	@Override
 	public String addActor(Actor actor) throws Exception {
-		ActorDAO actorDAO = new ActorDAO(driver);
+		ActorDAO actorDAO = getActorDAO();
 		Actor existingActor = actorDAO.getActor(actor.getId());
 		if (existingActor != null) throw new NodeAlreadyExistsException("Node already exists");
 		return actorDAO.insertActor(actor);
@@ -37,9 +39,18 @@ public class ActorServiceImpl implements ActorService {
 
 	@Override
 	public Actor getActor(String actorId) throws Exception {
-		ActorDAO actorDAO = new ActorDAO(driver);
-		return actorDAO.getActor(actorId);
+		ActorDAO actorDAO = getActorDAO();
+		Actor actor = actorDAO.getActor(actorId);
+//		System.out.println("Actor is null: " + actor.getMovies() == null);
+		actor.getMovies().addAll(actorDAO.getMoviesByActorID(actorId));
+		return actor;
 	}
+	
+	private ActorDAO getActorDAO() {
+		if (actorDAO == null) actorDAO = new ActorDAO(driver);
+		return actorDAO;
+	}
+	
 
 	
 }

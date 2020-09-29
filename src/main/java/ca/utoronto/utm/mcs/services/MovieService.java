@@ -1,10 +1,9 @@
 package ca.utoronto.utm.mcs.services;
 
-import com.sun.net.httpserver.HttpHandler;
-import com.sun.net.httpserver.HttpExchange;
+import ca.utoronto.utm.mcs.domain.Movie;
 
-public interface MovieService extends HttpHandler{
+public interface MovieService {
 
-	public void addMovie(HttpExchange r) throws Exception;
-	public void getMovie(HttpExchange r) throws Exception;
+	public String addMovie(Movie movie) throws Exception;
+	public Movie getMovie(String movieId) throws Exception;
 }

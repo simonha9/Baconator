@@ -7,8 +7,10 @@ import com.sun.net.httpserver.HttpHandler;
 import com.sun.net.httpserver.HttpServer;
 
 import ca.utoronto.utm.mcs.dao.Neo4jConnector;
+import ca.utoronto.utm.mcs.handlers.ActorMovieRelationshipRestHandler;
 import ca.utoronto.utm.mcs.handlers.ActorRestHandler;
 import ca.utoronto.utm.mcs.handlers.BaseHandler;
+import ca.utoronto.utm.mcs.handlers.MovieRestHandler;
 
 public class App 
 {
@@ -25,14 +27,14 @@ public class App
     private static void createContexts(HttpServer server, Neo4jConnector connector) {
     	BaseHandler actorHandler = new ActorRestHandler(connector.getDriver());
     	server.createContext("/api/v1/addActor", (HttpHandler) actorHandler);
-//    	server.createContext("/api/v1/getActor", actorHandler);
+    	server.createContext("/api/v1/getActor", actorHandler);
     	
-//    	MovieService movieService = new MovieServiceImpl();
-//    	server.createContext("/api/v1/addMovie", movieService);
-//    	server.createContext("/api/v1/getMovie", movieService);
+    	BaseHandler movieHandler = new MovieRestHandler(connector.getDriver());
+    	server.createContext("/api/v1/addMovie", movieHandler);
+    	server.createContext("/api/v1/getMovie", movieHandler);
 //    	
-//    	ActorMovieRelationshipService relationshipService = new ActorMovieRelationshipServiceImpl();
-//    	server.createContext("/api/v1/addRelationship", relationshipService);
+    	BaseHandler relationshipHandler = new ActorMovieRelationshipRestHandler(connector.getDriver());
+    	server.createContext("/api/v1/addRelationship", relationshipHandler);
 //    	server.createContext("/api/v1/getRelationship", relationshipService);
     }
 }
