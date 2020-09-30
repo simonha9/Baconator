@@ -40,7 +40,7 @@ public class ActorRestHandler extends BaseHandler {
 		ActorService actorService = getActorService();
 		Actor actor = getActor(r);
 		if (actor.getId() == null) throw new MissingInformationException("Required info is missing");
-		actor = actorService.getActor(actor.getId());
+		actor = actorService.getActorByID(actor.getId());
 		if (actor == null) throw new NodeNotExistException("That node does not exist");
 		String response = buildResponse(actor);
 		r.getResponseHeaders().set("Content-Type", "appication/json");
@@ -56,7 +56,7 @@ public class ActorRestHandler extends BaseHandler {
 		Actor actor = getActor(r);
 		if (actor.getName() == null || actor.getId() == null)
 			throw new MissingInformationException("Required info is missing");
-		Actor existingActor = actorService.getActor(actor.getId());
+		Actor existingActor = actorService.getActorByID(actor.getId());
 		if (existingActor != null) throw new NodeAlreadyExistsException("That actor already exists");
 		actorService.addActor(actor);
 		r.sendResponseHeaders(200, -1);

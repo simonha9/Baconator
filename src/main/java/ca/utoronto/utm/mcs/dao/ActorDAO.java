@@ -11,8 +11,10 @@ import org.neo4j.driver.Result;
 import org.neo4j.driver.Session;
 import org.neo4j.driver.Transaction;
 import org.neo4j.driver.TransactionWork;
+import org.neo4j.driver.types.Node;
 
 import ca.utoronto.utm.mcs.domain.Actor;
+import ca.utoronto.utm.mcs.domain.ActorMovieRelationship;
 
 public class ActorDAO {
 
@@ -73,7 +75,7 @@ public class ActorDAO {
 					return null;
 				}
 			});
-			if (name != null) {
+			if (id != null) {
 				actor = new Actor();
 				actor.setName(name);
 				actor.setId(id);
@@ -105,15 +107,15 @@ public class ActorDAO {
 		}
 	}
 
-	public Integer computeBaconNumber(Actor actor) {
+	public Integer computeShortestPath(Actor actor) {
 		try (Session session = driver.session()) {
 			Integer baconNum = session.writeTransaction(new TransactionWork<Integer>() {
 				@Override
 				public Integer execute(Transaction tx) {
 					Result result = tx.run(
-							"MATCH (KevinB:actor { name: 'Kevin Bacon' }), (a:actor { id = $actorID }), "
-									+ "p = shortestPath((KevinB)-[:ACTED_IN]-(a)) "
-									+ "RETURN p",
+							"MATCH (a:actor { name: 'Kevin Bacon' }), (b:actor { id: $actorID }), "
+									+ "p = shortestPath((a)-[*]-(b)) "
+									+ "RETURN size([m in nodes(p) WHERE m:movie]) as baconNumber",
 							parameters("actorID", actor.getId()));
 					if (result.hasNext()) {
 						return result.single().get(0).asInt();
@@ -127,5 +129,45 @@ public class ActorDAO {
 			return null;
 		}
 	}
+	
+	public List<ActorMovieRelationship> computeBaconPath(Actor actor) {
+		List<ActorMovieRelationship> rels = null;
+		try (Session session = driver.session()) {
+			List<Record> recs = session.writeTransaction(new TransactionWork<List<Record>>() {
+				@Override
+				public List<Record> execute(Transaction tx) {
+					Result result = tx.run(
+							"MATCH (a:actor { name: 'Kevin Bacon' }), (b:actor { id: $actorID }), "
+									+ "p = shortestPath((a)-[*]-(b)) "
+									+ "with reverse(nodes(p)) as path "
+									+ "unwind path as flatPath "
+									+ "RETURN flatPath",
+							parameters("actorID", actor.getId()));
+					if (result.hasNext()) {
+						return result.list();
+					}
+					return null;
+				}
+			});
+			if (recs != null) {
+				rels = new ArrayList<>();
+				for (int i = 0; i < recs.size() - 1; i++) {
+					Record rec1 = recs.get(i);
+					Record rec2 = recs.get(i+1);
+					ActorMovieRelationship relationship = new ActorMovieRelationship();
+					if (i%2 == 0) {
+						relationship.setActorID(rec1.get("flatPath").get("id", ""));
+						relationship.setMovieID(rec2.get("flatPath").get("id", ""));
+					} else {
+						relationship.setMovieID(rec1.get("flatPath").get("id", ""));
+						relationship.setActorID(rec2.get("flatPath").get("id", ""));
+					}
+					rels.add(relationship);
+				}
+			}
+			return rels;
+		}
+	}
+	
 
 }

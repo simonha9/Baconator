@@ -20,8 +20,6 @@ public class MovieServiceImpl implements MovieService {
 	@Override
 	public String addMovie(Movie movie) throws Exception {
 		MovieDAO movieDAO = getMovieDAO();
-		Movie existingMovie = movieDAO.getMovie(movie.getId());
-		if (existingMovie != null) throw new NodeAlreadyExistsException("Node already exists");
 		return movieDAO.insertMovie(movie);
 	}
 

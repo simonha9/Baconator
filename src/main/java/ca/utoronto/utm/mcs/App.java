@@ -10,6 +10,7 @@ import ca.utoronto.utm.mcs.dao.Neo4jConnector;
 import ca.utoronto.utm.mcs.handlers.ActorMovieRelationshipRestHandler;
 import ca.utoronto.utm.mcs.handlers.ActorRestHandler;
 import ca.utoronto.utm.mcs.handlers.BaconNumberRestHandler;
+import ca.utoronto.utm.mcs.handlers.BaconPathRestHandler;
 import ca.utoronto.utm.mcs.handlers.BaseHandler;
 import ca.utoronto.utm.mcs.handlers.MovieRestHandler;
 
@@ -40,5 +41,8 @@ public class App
     	
     	BaseHandler baconNumberHandler = new BaconNumberRestHandler(connector.getDriver());
     	server.createContext("/api/v1/computeBaconNumber", baconNumberHandler);
+    	
+    	BaseHandler baconPathHandler = new BaconPathRestHandler(connector.getDriver());
+    	server.createContext("/api/v1/computeBaconPath", baconPathHandler);
     }
 }

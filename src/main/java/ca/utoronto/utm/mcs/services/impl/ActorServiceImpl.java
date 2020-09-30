@@ -1,5 +1,7 @@
 package ca.utoronto.utm.mcs.services.impl;
 
+import java.util.List;
+
 import org.neo4j.driver.Driver;
 
 import ca.utoronto.utm.mcs.dao.ActorDAO;
@@ -23,9 +25,10 @@ public class ActorServiceImpl implements ActorService {
 	
 	@Override
 	public Integer computeBaconNumber(Actor actor) throws Exception {
-		checkActorExistsByName(kevinBacon);
-		checkActorExistsByID(actor.getId());
-		return actorDAO.computeBaconNumber(actor);
+		ActorDAO actorDAO = getActorDAO();
+		Actor kevinB = actorDAO.getActorByName(kevinBacon);
+		Actor otherActor = actorDAO.getActorByID(actor.getId());
+		return actorDAO.computeShortestPath(otherActor);
 	}
 
 	@Override
@@ -41,7 +44,7 @@ public class ActorServiceImpl implements ActorService {
 	}
 
 	@Override
-	public Actor getActor(String actorId) throws Exception {
+	public Actor getActorByID(String actorId) throws Exception {
 		ActorDAO actorDAO = getActorDAO();
 		Actor actor = actorDAO.getActorByID(actorId);
 		if (actor == null) return null;
@@ -53,19 +56,20 @@ public class ActorServiceImpl implements ActorService {
 		if (actorDAO == null) actorDAO = new ActorDAO(driver);
 		return actorDAO;
 	}
-	
-	private Boolean checkActorExistsByID(String actorId) throws NodeNotExistException {
-		ActorDAO actorDAO = new ActorDAO(driver);
-		Actor actor = actorDAO.getActorByID(actorId);
-		if (actor == null) throw new NodeNotExistException("That node does not exist");
-		return true;
-	}
-	
-	private Boolean checkActorExistsByName(String actorName) throws NodeNotExistException {
-		ActorDAO actorDAO = new ActorDAO(driver);
+
+	@Override
+	public Actor getActorByName(String actorName) throws Exception {
+		ActorDAO actorDAO = getActorDAO();
 		Actor actor = actorDAO.getActorByName(actorName);
-		if (actor == null) throw new NodeNotExistException("That node does not exist");
-		return true;
+		if (actor == null) return null;
+		actor.getMovies().addAll(actorDAO.getMoviesByActorID(actor.getId()));
+		return actor;
+	}
+
+	@Override
+	public List<ActorMovieRelationship> computeBaconPath(Actor actor) throws Exception {
+		ActorDAO actorDAO = getActorDAO();
+		return actorDAO.computeBaconPath(actor);
 	}
 	
 	

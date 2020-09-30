@@ -1,7 +1,5 @@
 package ca.utoronto.utm.mcs.domain;
 
-import java.util.List;
-
 public class ActorMovieRelationship extends BaseDataEntity {
 
 	private static final long serialVersionUID = 58059863990569983L;

@@ -24,4 +24,8 @@ public class Neo4jConnector {
 		return driver;
 	}
 	
+	public void finalize() {
+		driver.close();
+	}
+	
 }
