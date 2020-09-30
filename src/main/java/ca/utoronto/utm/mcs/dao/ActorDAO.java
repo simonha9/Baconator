@@ -15,9 +15,9 @@ import org.neo4j.driver.TransactionWork;
 import ca.utoronto.utm.mcs.domain.Actor;
 
 public class ActorDAO {
-	
+
 	private Driver driver;
-	
+
 	public ActorDAO(Driver driver) {
 		super();
 		this.driver = driver;
@@ -32,7 +32,7 @@ public class ActorDAO {
 		}
 	}
 
-	public Actor getActor(String actorID) {
+	public Actor getActorByID(String actorID) {
 		Actor actor = null;
 		try (Session session = driver.session()) {
 			String name = session.writeTransaction(new TransactionWork<String>() {
@@ -58,6 +58,32 @@ public class ActorDAO {
 		}
 	}
 	
+	public Actor getActorByName(String name) {
+		Actor actor = null;
+		try (Session session = driver.session()) {
+			String id = session.writeTransaction(new TransactionWork<String>() {
+				@Override
+				public String execute(Transaction tx) {
+					Result result = tx.run("MATCH (a: actor) " + "WHERE a.name = $name" + " RETURN a.id as id",
+							parameters("name", name));
+
+					if (result.hasNext()) {
+						return result.single().get(0).asString();
+					}
+					return null;
+				}
+			});
+			if (name != null) {
+				actor = new Actor();
+				actor.setName(name);
+				actor.setId(id);
+				session.close();
+				return actor;
+			}
+			return null;
+		}
+	}
+
 	public List<String> getMoviesByActorID(String actorID) {
 		List<String> movies = new ArrayList<>();
 		try (Session session = driver.session()) {
@@ -78,5 +104,28 @@ public class ActorDAO {
 			return movies;
 		}
 	}
-	
+
+	public Integer computeBaconNumber(Actor actor) {
+		try (Session session = driver.session()) {
+			Integer baconNum = session.writeTransaction(new TransactionWork<Integer>() {
+				@Override
+				public Integer execute(Transaction tx) {
+					Result result = tx.run(
+							"MATCH (KevinB:actor { name: 'Kevin Bacon' }), (a:actor { id = $actorID }), "
+									+ "p = shortestPath((KevinB)-[:ACTED_IN]-(a)) "
+									+ "RETURN p",
+							parameters("actorID", actor.getId()));
+					if (result.hasNext()) {
+						return result.single().get(0).asInt();
+					}
+					return null;
+				}
+			});
+			if (baconNum != null) {
+				return baconNum;
+			}
+			return null;
+		}
+	}
+
 }

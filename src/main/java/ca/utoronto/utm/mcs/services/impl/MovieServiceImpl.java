@@ -28,7 +28,10 @@ public class MovieServiceImpl implements MovieService {
 	@Override
 	public Movie getMovie(String movieId) throws Exception {
 		MovieDAO movieDAO = getMovieDAO();
-		return movieDAO.getMovie(movieId);
+		Movie movie = movieDAO.getMovie(movieId);
+		if (movie == null) return null;
+		movie.getActors().addAll(movieDAO.getActorsByMovieId(movieId));
+		return movie;
 	}
 	
 	private MovieDAO getMovieDAO() {

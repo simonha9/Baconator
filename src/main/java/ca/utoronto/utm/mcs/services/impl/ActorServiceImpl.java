@@ -3,8 +3,12 @@ package ca.utoronto.utm.mcs.services.impl;
 import org.neo4j.driver.Driver;
 
 import ca.utoronto.utm.mcs.dao.ActorDAO;
+import ca.utoronto.utm.mcs.dao.MovieDAO;
 import ca.utoronto.utm.mcs.domain.Actor;
+import ca.utoronto.utm.mcs.domain.ActorMovieRelationship;
+import ca.utoronto.utm.mcs.domain.Movie;
 import ca.utoronto.utm.mcs.exceptions.NodeAlreadyExistsException;
+import ca.utoronto.utm.mcs.exceptions.NodeNotExistException;
 import ca.utoronto.utm.mcs.services.ActorService;
 
 public class ActorServiceImpl implements ActorService {
@@ -18,9 +22,10 @@ public class ActorServiceImpl implements ActorService {
 	}
 	
 	@Override
-	public void computeBaconNumber() throws Exception {
-		// TODO Auto-generated method stub
-		
+	public Integer computeBaconNumber(Actor actor) throws Exception {
+		checkActorExistsByName(kevinBacon);
+		checkActorExistsByID(actor.getId());
+		return actorDAO.computeBaconNumber(actor);
 	}
 
 	@Override
@@ -32,16 +37,14 @@ public class ActorServiceImpl implements ActorService {
 	@Override
 	public String addActor(Actor actor) throws Exception {
 		ActorDAO actorDAO = getActorDAO();
-		Actor existingActor = actorDAO.getActor(actor.getId());
-		if (existingActor != null) throw new NodeAlreadyExistsException("Node already exists");
 		return actorDAO.insertActor(actor);
 	}
 
 	@Override
 	public Actor getActor(String actorId) throws Exception {
 		ActorDAO actorDAO = getActorDAO();
-		Actor actor = actorDAO.getActor(actorId);
-//		System.out.println("Actor is null: " + actor.getMovies() == null);
+		Actor actor = actorDAO.getActorByID(actorId);
+		if (actor == null) return null;
 		actor.getMovies().addAll(actorDAO.getMoviesByActorID(actorId));
 		return actor;
 	}
@@ -51,6 +54,21 @@ public class ActorServiceImpl implements ActorService {
 		return actorDAO;
 	}
 	
-
+	private Boolean checkActorExistsByID(String actorId) throws NodeNotExistException {
+		ActorDAO actorDAO = new ActorDAO(driver);
+		Actor actor = actorDAO.getActorByID(actorId);
+		if (actor == null) throw new NodeNotExistException("That node does not exist");
+		return true;
+	}
+	
+	private Boolean checkActorExistsByName(String actorName) throws NodeNotExistException {
+		ActorDAO actorDAO = new ActorDAO(driver);
+		Actor actor = actorDAO.getActorByName(actorName);
+		if (actor == null) throw new NodeNotExistException("That node does not exist");
+		return true;
+	}
+	
+	
+	
 	
 }

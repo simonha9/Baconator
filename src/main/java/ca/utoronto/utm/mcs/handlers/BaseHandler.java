@@ -2,15 +2,16 @@ package ca.utoronto.utm.mcs.handlers;
 
 import java.io.IOException;
 
-import com.sun.net.httpserver.HttpExchange;
-import com.sun.net.httpserver.HttpHandler;
-
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.neo4j.driver.Driver;
 
+import com.sun.net.httpserver.HttpExchange;
+import com.sun.net.httpserver.HttpHandler;
+
 import ca.utoronto.utm.mcs.exceptions.MissingInformationException;
 import ca.utoronto.utm.mcs.exceptions.NodeAlreadyExistsException;
+import ca.utoronto.utm.mcs.exceptions.NodeNotExistException;
 import ca.utoronto.utm.mcs.services.Utils;
 
 public abstract class BaseHandler implements HttpHandler {
@@ -32,6 +33,8 @@ public abstract class BaseHandler implements HttpHandler {
 		} catch (MissingInformationException | JSONException  | NodeAlreadyExistsException e) {
 			r.sendResponseHeaders(400, -1);
 			e.printStackTrace();
+		} catch (NodeNotExistException e) {
+			r.sendResponseHeaders(404, -1);
 		} catch (Exception e) {
 			e.printStackTrace();
 			r.sendResponseHeaders(500, -1);
