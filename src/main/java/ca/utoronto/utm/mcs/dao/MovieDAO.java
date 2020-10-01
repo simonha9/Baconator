@@ -12,7 +12,6 @@ import org.neo4j.driver.Session;
 import org.neo4j.driver.Transaction;
 import org.neo4j.driver.TransactionWork;
 
-import ca.utoronto.utm.mcs.domain.Actor;
 import ca.utoronto.utm.mcs.domain.Movie;
 
 public class MovieDAO {

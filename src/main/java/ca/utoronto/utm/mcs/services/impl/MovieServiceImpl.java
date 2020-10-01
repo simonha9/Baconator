@@ -4,7 +4,6 @@ import org.neo4j.driver.Driver;
 
 import ca.utoronto.utm.mcs.dao.MovieDAO;
 import ca.utoronto.utm.mcs.domain.Movie;
-import ca.utoronto.utm.mcs.exceptions.NodeAlreadyExistsException;
 import ca.utoronto.utm.mcs.services.MovieService;
 
 public class MovieServiceImpl implements MovieService {
@@ -24,7 +23,7 @@ public class MovieServiceImpl implements MovieService {
 	}
 
 	@Override
-	public Movie getMovie(String movieId) throws Exception {
+	public Movie getMovieByID(String movieId) throws Exception {
 		MovieDAO movieDAO = getMovieDAO();
 		Movie movie = movieDAO.getMovie(movieId);
 		if (movie == null) return null;

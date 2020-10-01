@@ -9,10 +9,18 @@ import org.neo4j.driver.Driver;
 
 import com.sun.net.httpserver.HttpExchange;
 
+import ca.utoronto.utm.mcs.domain.Actor;
 import ca.utoronto.utm.mcs.domain.ActorMovieRelationship;
+import ca.utoronto.utm.mcs.domain.Movie;
 import ca.utoronto.utm.mcs.exceptions.MissingInformationException;
+import ca.utoronto.utm.mcs.exceptions.NodeAlreadyExistsException;
+import ca.utoronto.utm.mcs.exceptions.NodeNotExistException;
 import ca.utoronto.utm.mcs.services.ActorMovieRelationshipService;
+import ca.utoronto.utm.mcs.services.ActorService;
+import ca.utoronto.utm.mcs.services.MovieService;
 import ca.utoronto.utm.mcs.services.impl.ActorMovieRelationshipServiceImpl;
+import ca.utoronto.utm.mcs.services.impl.ActorServiceImpl;
+import ca.utoronto.utm.mcs.services.impl.MovieServiceImpl;
 
 public class ActorMovieRelationshipRestHandler extends BaseHandler {
 	
@@ -27,7 +35,7 @@ public class ActorMovieRelationshipRestHandler extends BaseHandler {
 		ActorMovieRelationship relationship = new ActorMovieRelationship();
 		if (deserialized.has("actorId")) 
 			relationship.setActorID(deserialized.getString("actorId"));
-		if (deserialized.has("actorId"))
+		if (deserialized.has("movieId"))
 			relationship.setMovieID(deserialized.getString("movieId"));
 		
 		return relationship;
@@ -38,7 +46,12 @@ public class ActorMovieRelationshipRestHandler extends BaseHandler {
 		ActorMovieRelationshipService relationshipService = getRelationshipService();
 		ActorMovieRelationship relationship = getRelationship(r);
 		if (relationship.getActorID() == null || relationship.getMovieID() == null) throw new MissingInformationException("Required information is missing");
-		relationship.setHasRelationship(relationshipService.hasRelationship(relationship));
+		checkActorExists(relationship.getActorID());
+		checkMovieExists(relationship.getMovieID());
+		
+		relationship = relationshipService.getRelationship(relationship);
+		relationship.setHasRelationship(relationship == null ? null : relationship.actorID != null && relationship.getMovieID() != null);
+		
 		String response = buildResponse(relationship);
 		r.getResponseHeaders().set("Content-Type", "appication/json");
 		r.sendResponseHeaders(200, response.length());
@@ -53,6 +66,10 @@ public class ActorMovieRelationshipRestHandler extends BaseHandler {
 		ActorMovieRelationship relationship = getRelationship(r);
 		if (relationship.getActorID() == null || relationship.getMovieID() == null) 
 			throw new MissingInformationException("Required info is missing");
+		checkActorExists(relationship.getActorID());
+		checkMovieExists(relationship.getMovieID());
+		ActorMovieRelationship existingRel = relationshipService.getRelationship(relationship);
+		if (existingRel != null) throw new NodeAlreadyExistsException("That relationship already exists");
 		relationshipService.addRelationship(relationship);
 		r.sendResponseHeaders(200, -1);
 	}
@@ -71,6 +88,17 @@ public class ActorMovieRelationshipRestHandler extends BaseHandler {
 		return obj.toString();
 	}
 	
+	private void checkActorExists(String actorID) throws Exception {
+		ActorService actorService = new ActorServiceImpl(driver);
+		Actor actor = actorService.getActorByID(actorID);
+		if (actor == null) throw new NodeNotExistException("That node does not exist");
+	}
+	
+	private void checkMovieExists(String movieID) throws Exception {
+		MovieService movieService = new MovieServiceImpl(driver);
+		Movie movie = movieService.getMovieByID(movieID);
+		if (movie == null) throw new NodeNotExistException("That node does not exist");
+	}
 	
 
 }

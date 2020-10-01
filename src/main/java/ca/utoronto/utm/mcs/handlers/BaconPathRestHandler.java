@@ -17,9 +17,7 @@ import ca.utoronto.utm.mcs.exceptions.MissingInformationException;
 import ca.utoronto.utm.mcs.exceptions.NoPathException;
 import ca.utoronto.utm.mcs.exceptions.NodeAlreadyExistsException;
 import ca.utoronto.utm.mcs.exceptions.NodeNotExistException;
-import ca.utoronto.utm.mcs.services.ActorMovieRelationshipService;
 import ca.utoronto.utm.mcs.services.ActorService;
-import ca.utoronto.utm.mcs.services.impl.ActorMovieRelationshipServiceImpl;
 import ca.utoronto.utm.mcs.services.impl.ActorServiceImpl;
 
 public class BaconPathRestHandler extends BaseHandler {
@@ -28,6 +26,24 @@ public class BaconPathRestHandler extends BaseHandler {
 
 	public BaconPathRestHandler(Driver driver) {
 		super(driver);
+	}
+	
+	@Override
+	public void handle(HttpExchange r) throws IOException {
+		try {
+			if (r.getRequestMethod().equals("GET")) {
+				handleGet(r);
+			} else if (r.getRequestMethod().equals("POST")) {
+				handlePost(r);
+			}
+		} catch (MissingInformationException | JSONException  | NodeAlreadyExistsException | NodeNotExistException e) {
+			e.printStackTrace();
+			r.sendResponseHeaders(400, -1);
+		} catch (NoPathException e) {
+			r.sendResponseHeaders(404, -1);
+		} catch (Exception e) {
+			r.sendResponseHeaders(500, -1);
+		}
 	}
 
 	private Actor getActor(HttpExchange r) throws IOException, JSONException {
@@ -61,6 +77,7 @@ public class BaconPathRestHandler extends BaseHandler {
 //				System.out.println("Movieid: " + rel.getMovieID());
 //			}
 		}
+		if (rels == null) throw new NoPathException("There does not exist a path to Kevin Bacon");
 		String response = buildResponse(rels, baconNumber);
 		r.getResponseHeaders().set("Content-Type", "appication/json");
 		r.sendResponseHeaders(200, response.length());

@@ -2,17 +2,12 @@ package ca.utoronto.utm.mcs.dao;
 
 import static org.neo4j.driver.Values.parameters;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.neo4j.driver.Driver;
-import org.neo4j.driver.Record;
 import org.neo4j.driver.Result;
 import org.neo4j.driver.Session;
 import org.neo4j.driver.Transaction;
 import org.neo4j.driver.TransactionWork;
 
-import ca.utoronto.utm.mcs.domain.Actor;
 import ca.utoronto.utm.mcs.domain.ActorMovieRelationship;
 
 public class ActorMovieRelationshipDAO {
@@ -34,7 +29,7 @@ public class ActorMovieRelationshipDAO {
 		}
 	}
 
-	public ActorMovieRelationship hasRelationship(String actorId, String movieId) {
+	public ActorMovieRelationship getRelationship(String actorId, String movieId) {
 		ActorMovieRelationship relationship = null;
 		try (Session session = driver.session()) {
 			String rel = session.writeTransaction(new TransactionWork<String>() {

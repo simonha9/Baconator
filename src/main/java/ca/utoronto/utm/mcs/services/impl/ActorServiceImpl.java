@@ -5,12 +5,8 @@ import java.util.List;
 import org.neo4j.driver.Driver;
 
 import ca.utoronto.utm.mcs.dao.ActorDAO;
-import ca.utoronto.utm.mcs.dao.MovieDAO;
 import ca.utoronto.utm.mcs.domain.Actor;
 import ca.utoronto.utm.mcs.domain.ActorMovieRelationship;
-import ca.utoronto.utm.mcs.domain.Movie;
-import ca.utoronto.utm.mcs.exceptions.NodeAlreadyExistsException;
-import ca.utoronto.utm.mcs.exceptions.NodeNotExistException;
 import ca.utoronto.utm.mcs.services.ActorService;
 
 public class ActorServiceImpl implements ActorService {

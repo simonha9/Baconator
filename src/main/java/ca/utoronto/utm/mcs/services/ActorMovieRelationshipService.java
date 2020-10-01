@@ -5,5 +5,5 @@ import ca.utoronto.utm.mcs.domain.ActorMovieRelationship;
 public interface ActorMovieRelationshipService {
 
 	public ActorMovieRelationship addRelationship(ActorMovieRelationship relationship) throws Exception;
-	public Boolean hasRelationship(ActorMovieRelationship relationship) throws Exception;
+	public ActorMovieRelationship getRelationship(ActorMovieRelationship relationship) throws Exception;
 }

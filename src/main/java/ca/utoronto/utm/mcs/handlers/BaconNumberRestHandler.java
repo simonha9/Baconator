@@ -42,6 +42,7 @@ public class BaconNumberRestHandler extends BaseHandler {
 				handlePost(r);
 			}
 		} catch (MissingInformationException | JSONException  | NodeAlreadyExistsException | NodeNotExistException e) {
+			e.printStackTrace();
 			r.sendResponseHeaders(400, -1);
 		} catch (NoPathException e) {
 			r.sendResponseHeaders(404, -1);
