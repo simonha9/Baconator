@@ -18,6 +18,8 @@ public abstract class BaseHandler implements HttpHandler {
 
 	Driver driver;
 	
+	public static final String kevinBaconId = "nm0000102";
+	
 	public BaseHandler(Driver driver) {
 		this.driver = driver;
 	}

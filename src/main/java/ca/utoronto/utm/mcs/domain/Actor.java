@@ -5,10 +5,8 @@ import java.util.List;
 
 public class Actor extends BaseDataEntity {
 
-	private static final long serialVersionUID = 58059863990569983L;
-
-	public String name;
-	public List<String> movies = new ArrayList<>();
+	private String name;
+	private List<String> movies = new ArrayList<>();
 
 	public String getName() {
 		return name;

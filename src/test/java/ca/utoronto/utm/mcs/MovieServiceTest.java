@@ -3,11 +3,8 @@ package ca.utoronto.utm.mcs;
 import org.junit.Test;
 
 import ca.utoronto.utm.mcs.dao.Neo4jConnector;
-import ca.utoronto.utm.mcs.domain.ActorMovieRelationship;
 import ca.utoronto.utm.mcs.domain.Movie;
-import ca.utoronto.utm.mcs.services.ActorMovieRelationshipService;
 import ca.utoronto.utm.mcs.services.MovieService;
-import ca.utoronto.utm.mcs.services.impl.ActorMovieRelationshipServiceImpl;
 import ca.utoronto.utm.mcs.services.impl.MovieServiceImpl;
 import junit.framework.Assert;
 import junit.framework.TestCase;
@@ -25,7 +22,7 @@ public class MovieServiceTest extends TestCase {
 		MovieService movieService = new MovieServiceImpl(connector.getDriver());
 		movieService.addMovie(movie);
 		
-		Movie responseMovie = movieService.getMovieByID(movie.getId());
+		Movie responseMovie = movieService.findMovieById(movie.getId());
 		
 		Assert.assertEquals(movie.getId(), responseMovie.getId());
 		Assert.assertEquals(movie.getName(), responseMovie.getName());
@@ -38,7 +35,7 @@ public class MovieServiceTest extends TestCase {
 		movie.setId("-1");
 		
 		MovieService movieService = new MovieServiceImpl(connector.getDriver());
-		Movie responseMovie = movieService.getMovieByID(movie.getId());
+		Movie responseMovie = movieService.findMovieById(movie.getId());
 		
 		Assert.assertNull(responseMovie);
 	}

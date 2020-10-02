@@ -31,7 +31,6 @@ public class MovieRestHandler extends BaseHandler {
 			movie.setName(deserialized.getString("name"));
 		if (deserialized.has("movieId"))
 			movie.setId(deserialized.getString("movieId"));
-		
 		return movie;
 	}
 
@@ -39,9 +38,7 @@ public class MovieRestHandler extends BaseHandler {
 	public void handleGet(HttpExchange r) throws Exception {
 		MovieService movieService = getMovieService();
 		Movie movie = getMovie(r);
-		if (movie.getId() == null) throw new MissingInformationException("Required information is missing");
-		movie = movieService.getMovieByID(movie.getId());
-		if (movie == null) throw new NodeNotExistException("That node does not exist");
+		movie = movieService.findMovieById(movie.getId());
 		String response = buildResponse(movie);
 		r.getResponseHeaders().set("Content-Type", "appication/json");
 		r.sendResponseHeaders(200, response.length());
@@ -54,10 +51,6 @@ public class MovieRestHandler extends BaseHandler {
 	public void handlePost(HttpExchange r) throws Exception {
 		MovieService movieService = getMovieService();
 		Movie movie = getMovie(r);
-		if (movie.getName() == null || movie.getId() == null) 
-			throw new MissingInformationException("Required info is missing");
-		Movie existingMovie = movieService.getMovieByID(movie.getId());
-		if (existingMovie != null) throw new NodeAlreadyExistsException("That node already exists");
 		movieService.addMovie(movie);
 		r.sendResponseHeaders(200, -1);
 	}

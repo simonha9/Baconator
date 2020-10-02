@@ -45,13 +45,8 @@ public class ActorMovieRelationshipRestHandler extends BaseHandler {
 	public void handleGet(HttpExchange r) throws Exception {
 		ActorMovieRelationshipService relationshipService = getRelationshipService();
 		ActorMovieRelationship relationship = getRelationship(r);
-		if (relationship.getActorID() == null || relationship.getMovieID() == null) throw new MissingInformationException("Required information is missing");
-		checkActorExists(relationship.getActorID());
-		checkMovieExists(relationship.getMovieID());
-		
 		relationship = relationshipService.getRelationship(relationship);
-		relationship.setHasRelationship(relationship == null ? null : relationship.actorID != null && relationship.getMovieID() != null);
-		
+		relationship.setHasRelationship(relationship == null ? null : relationship.getActorID() != null && relationship.getMovieID() != null);
 		String response = buildResponse(relationship);
 		r.getResponseHeaders().set("Content-Type", "appication/json");
 		r.sendResponseHeaders(200, response.length());
@@ -64,12 +59,6 @@ public class ActorMovieRelationshipRestHandler extends BaseHandler {
 	public void handlePost(HttpExchange r) throws Exception {
 		ActorMovieRelationshipService relationshipService = getRelationshipService();
 		ActorMovieRelationship relationship = getRelationship(r);
-		if (relationship.getActorID() == null || relationship.getMovieID() == null) 
-			throw new MissingInformationException("Required info is missing");
-		checkActorExists(relationship.getActorID());
-		checkMovieExists(relationship.getMovieID());
-		ActorMovieRelationship existingRel = relationshipService.getRelationship(relationship);
-		if (existingRel != null) throw new NodeAlreadyExistsException("That relationship already exists");
 		relationshipService.addRelationship(relationship);
 		r.sendResponseHeaders(200, -1);
 	}
@@ -88,17 +77,7 @@ public class ActorMovieRelationshipRestHandler extends BaseHandler {
 		return obj.toString();
 	}
 	
-	private void checkActorExists(String actorID) throws Exception {
-		ActorService actorService = new ActorServiceImpl(driver);
-		Actor actor = actorService.getActorByID(actorID);
-		if (actor == null) throw new NodeNotExistException("That node does not exist");
-	}
 	
-	private void checkMovieExists(String movieID) throws Exception {
-		MovieService movieService = new MovieServiceImpl(driver);
-		Movie movie = movieService.getMovieByID(movieID);
-		if (movie == null) throw new NodeNotExistException("That node does not exist");
-	}
 	
 
 }

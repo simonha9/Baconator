@@ -11,21 +11,23 @@ public class Neo4jConnector {
 	private static String username = "neo4j";
 	private static String password = "1234";
 	private static final Neo4jConnector connector = new Neo4jConnector();
-	
+
 	private Neo4jConnector() {
 		Neo4jConnector.driver = GraphDatabase.driver(uriDb, AuthTokens.basic(username, password));
 	};
-	
+
 	public static Neo4jConnector getInstance() {
 		return connector;
 	}
-	
+
 	public Driver getDriver() {
 		return driver;
 	}
-	
+
 	public void finalize() {
-		driver.close();
+		if (driver != null) {
+			driver.close();
+		}
 	}
-	
+
 }

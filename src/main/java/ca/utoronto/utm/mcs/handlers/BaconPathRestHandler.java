@@ -61,10 +61,10 @@ public class BaconPathRestHandler extends BaseHandler {
 		List<ActorMovieRelationship> rels = new ArrayList<>();
 		if (actor.getId() == null)
 			throw new MissingInformationException("Required Information does not exist");
-		actor = actorService.getActorByID(actor.getId());
+		actor = actorService.findActorById(actor.getId());
 		if (actor == null)
 			throw new NodeNotExistException("That node does not exist");
-		Actor kevinB = actorService.getActorByName("Kevin Bacon");
+		Actor kevinB = actorService.findActorById(kevinBaconId);
 		if (kevinB == null) 
 			throw new NodeNotExistException("That node does not exist");
 		

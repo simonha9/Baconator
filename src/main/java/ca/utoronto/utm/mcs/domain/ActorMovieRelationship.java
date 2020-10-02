@@ -2,11 +2,9 @@ package ca.utoronto.utm.mcs.domain;
 
 public class ActorMovieRelationship extends BaseDataEntity {
 
-	private static final long serialVersionUID = 58059863990569983L;
-	
-	public String movieID;
-	public String actorID;
-	public Boolean hasRelationship;
+	private String movieID;
+	private String actorID;
+	private Boolean hasRelationship;
 	public String getMovieID() {
 		return movieID;
 	}

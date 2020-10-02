@@ -10,9 +10,6 @@ import org.neo4j.driver.Driver;
 import com.sun.net.httpserver.HttpExchange;
 
 import ca.utoronto.utm.mcs.domain.Actor;
-import ca.utoronto.utm.mcs.exceptions.MissingInformationException;
-import ca.utoronto.utm.mcs.exceptions.NodeAlreadyExistsException;
-import ca.utoronto.utm.mcs.exceptions.NodeNotExistException;
 import ca.utoronto.utm.mcs.services.ActorService;
 import ca.utoronto.utm.mcs.services.impl.ActorServiceImpl;
 
@@ -22,6 +19,7 @@ public class ActorRestHandler extends BaseHandler {
 
 	public ActorRestHandler(Driver driver) {
 		super(driver);
+		actorService = new ActorServiceImpl(driver);
 	}
 
 	private Actor getActor(HttpExchange r) throws IOException, JSONException {
@@ -39,9 +37,7 @@ public class ActorRestHandler extends BaseHandler {
 	public void handleGet(HttpExchange r) throws Exception {
 		ActorService actorService = getActorService();
 		Actor actor = getActor(r);
-		if (actor.getId() == null) throw new MissingInformationException("Required info is missing");
-		actor = actorService.getActorByID(actor.getId());
-		if (actor == null) throw new NodeNotExistException("That node does not exist");
+		actor = actorService.findActorById(actor.getId());
 		String response = buildResponse(actor);
 		r.getResponseHeaders().set("Content-Type", "appication/json");
 		r.sendResponseHeaders(200, response.length());
@@ -54,17 +50,11 @@ public class ActorRestHandler extends BaseHandler {
 	public void handlePost(HttpExchange r) throws Exception {
 		ActorService actorService = getActorService();
 		Actor actor = getActor(r);
-		if (actor.getName() == null || actor.getId() == null)
-			throw new MissingInformationException("Required info is missing");
-		Actor existingActor = actorService.getActorByID(actor.getId());
-		if (existingActor != null) throw new NodeAlreadyExistsException("That actor already exists");
-		actorService.addActor(actor);
+		actorService.insertActor(actor);
 		r.sendResponseHeaders(200, -1);
 	}
 
 	private ActorService getActorService() {
-		if (actorService == null)
-			actorService = new ActorServiceImpl(driver);
 		return actorService;
 	}
 
