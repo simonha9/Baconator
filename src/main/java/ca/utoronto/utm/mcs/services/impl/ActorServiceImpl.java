@@ -88,6 +88,7 @@ public class ActorServiceImpl implements ActorService {
 				rel.setActorID(kevinBaconId);
 				rel.setMovieID(movies.get(0));
 				rel.setHasRelationship(true);
+				rels.add(rel);
 			}
 		}
 		if (rels == null) throw new NoPathException("There does not exist a path to Kevin Bacon");

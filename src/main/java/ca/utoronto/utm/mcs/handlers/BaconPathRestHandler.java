@@ -69,7 +69,7 @@ public class BaconPathRestHandler extends BaseHandler {
 
 	private String buildResponse(List<ActorMovieRelationship> rels, Integer baconNumber) throws JSONException {
 		JSONObject obj = new JSONObject();
-		obj.accumulate("baconNumber", baconNumber);
+		obj.accumulate("baconNumber", baconNumber.toString());
 		JSONArray arr = new JSONArray();
 		for (ActorMovieRelationship rel : rels) {
 			JSONObject nested = new JSONObject();

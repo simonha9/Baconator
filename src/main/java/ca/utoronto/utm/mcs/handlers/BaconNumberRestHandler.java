@@ -69,7 +69,7 @@ public class BaconNumberRestHandler extends BaseHandler {
 
 	private String buildResponse(Integer baconNumber) throws JSONException {
 		JSONObject obj = new JSONObject();
-		obj.accumulate("baconNumber", baconNumber);
+		obj.accumulate("baconNumber", baconNumber.toString());
 		return obj.toString();
 	}
 
