@@ -4,7 +4,10 @@ import org.junit.Test;
 
 import ca.utoronto.utm.mcs.dao.Neo4jConnector;
 import ca.utoronto.utm.mcs.domain.Movie;
+import ca.utoronto.utm.mcs.exceptions.NodeNotExistException;
+import ca.utoronto.utm.mcs.services.ActorService;
 import ca.utoronto.utm.mcs.services.MovieService;
+import ca.utoronto.utm.mcs.services.impl.ActorServiceImpl;
 import ca.utoronto.utm.mcs.services.impl.MovieServiceImpl;
 import junit.framework.Assert;
 import junit.framework.TestCase;
@@ -33,11 +36,14 @@ public class MovieServiceTest extends TestCase {
 		Movie movie = new Movie();
 		movie.setName("not a move");
 		movie.setId("-1");
+		Movie responseMovie = null;
 		
-		MovieService movieService = new MovieServiceImpl(connector.getDriver());
-		Movie responseMovie = movieService.findMovieById(movie.getId());
-		
-		Assert.assertNull(responseMovie);
+		try {
+			MovieService movieService = new MovieServiceImpl(connector.getDriver());
+			responseMovie = movieService.findMovieById(movie.getId());
+		} catch (NodeNotExistException e) {
+			Assert.assertNull(responseMovie);
+		}
 	}
 	
 	

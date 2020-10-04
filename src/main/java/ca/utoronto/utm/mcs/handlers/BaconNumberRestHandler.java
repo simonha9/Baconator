@@ -23,6 +23,7 @@ public class BaconNumberRestHandler extends BaseHandler {
 
 	public BaconNumberRestHandler(Driver driver) {
 		super(driver);
+		actorService = new ActorServiceImpl(driver);
 	}
 
 	private Actor getActor(HttpExchange r) throws IOException, JSONException {
@@ -38,11 +39,8 @@ public class BaconNumberRestHandler extends BaseHandler {
 		try {
 			if (r.getRequestMethod().equals("GET")) {
 				handleGet(r);
-			} else if (r.getRequestMethod().equals("POST")) {
-				handlePost(r);
 			}
 		} catch (MissingInformationException | JSONException  | NodeAlreadyExistsException | NodeNotExistException e) {
-			e.printStackTrace();
 			r.sendResponseHeaders(400, -1);
 		} catch (NoPathException e) {
 			r.sendResponseHeaders(404, -1);
@@ -53,22 +51,9 @@ public class BaconNumberRestHandler extends BaseHandler {
 
 	@Override
 	public void handleGet(HttpExchange r) throws Exception {
-		ActorService actorService = getActorService();
 		Actor actor = getActor(r);
 		Integer baconNumber = 0;
-		if (actor.getId() == null)
-			throw new MissingInformationException("Required Information does not exist");
-		actor = actorService.findActorById(actor.getId());
-		if (actor == null)
-			throw new NodeNotExistException("That node does not exist");
-		Actor kevinB = actorService.findActorById(kevinBaconId);
-		if (kevinB == null) 
-			throw new NodeNotExistException("That node does not exist");
-		if (!actor.getName().equals("Kevin Bacon")) {
-			baconNumber = actorService.computeBaconNumber(actor);
-			if (baconNumber == null)
-				throw new NoPathException("There is no path");
-		}
+		baconNumber = actorService.computeBaconNumber(actor.getId());
 		String response = buildResponse(baconNumber);
 		r.getResponseHeaders().set("Content-Type", "appication/json");
 		r.sendResponseHeaders(200, response.length());
@@ -78,14 +63,8 @@ public class BaconNumberRestHandler extends BaseHandler {
 	}
 
 	@Override
-	public void handlePost(HttpExchange r) throws Exception {
+	public void handlePut(HttpExchange r) throws Exception {
 
-	}
-
-	private ActorService getActorService() {
-		if (actorService == null)
-			actorService = new ActorServiceImpl(driver);
-		return actorService;
 	}
 
 	private String buildResponse(Integer baconNumber) throws JSONException {

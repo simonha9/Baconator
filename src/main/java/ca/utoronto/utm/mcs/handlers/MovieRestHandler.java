@@ -10,9 +10,6 @@ import org.neo4j.driver.Driver;
 import com.sun.net.httpserver.HttpExchange;
 
 import ca.utoronto.utm.mcs.domain.Movie;
-import ca.utoronto.utm.mcs.exceptions.MissingInformationException;
-import ca.utoronto.utm.mcs.exceptions.NodeAlreadyExistsException;
-import ca.utoronto.utm.mcs.exceptions.NodeNotExistException;
 import ca.utoronto.utm.mcs.services.MovieService;
 import ca.utoronto.utm.mcs.services.impl.MovieServiceImpl;
 
@@ -22,6 +19,7 @@ public class MovieRestHandler extends BaseHandler {
 	
 	public MovieRestHandler(Driver driver) {
 		super(driver);
+		movieService = new MovieServiceImpl(driver);
 	}
 	
 	private Movie getMovie(HttpExchange r) throws IOException, JSONException {
@@ -36,7 +34,6 @@ public class MovieRestHandler extends BaseHandler {
 
 	@Override
 	public void handleGet(HttpExchange r) throws Exception {
-		MovieService movieService = getMovieService();
 		Movie movie = getMovie(r);
 		movie = movieService.findMovieById(movie.getId());
 		String response = buildResponse(movie);
@@ -48,16 +45,10 @@ public class MovieRestHandler extends BaseHandler {
 	}
 	
 	@Override
-	public void handlePost(HttpExchange r) throws Exception {
-		MovieService movieService = getMovieService();
+	public void handlePut(HttpExchange r) throws Exception {
 		Movie movie = getMovie(r);
 		movieService.addMovie(movie);
 		r.sendResponseHeaders(200, -1);
-	}
-	
-	private MovieService getMovieService() {
-		if (movieService == null) movieService = new MovieServiceImpl(driver);
-		return movieService;
 	}
 	
 	private String buildResponse(Movie movie) throws JSONException {

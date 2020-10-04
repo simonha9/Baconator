@@ -2,8 +2,6 @@ package ca.utoronto.utm.mcs.dao;
 
 import static org.neo4j.driver.Values.parameters;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Map;
 
 import org.neo4j.driver.Driver;
@@ -11,10 +9,7 @@ import org.neo4j.driver.Query;
 import org.neo4j.driver.Record;
 import org.neo4j.driver.Result;
 import org.neo4j.driver.Session;
-import org.neo4j.driver.Transaction;
-import org.neo4j.driver.TransactionWork;
 
-import ca.utoronto.utm.mcs.domain.Actor;
 import ca.utoronto.utm.mcs.domain.Movie;
 
 public class MovieDAO {
@@ -42,15 +37,15 @@ public class MovieDAO {
 			Result result = session.run(query.withParameters(parameters("movieId", movieId)));
 			if (result.hasNext()) {
 				Record record = result.single();
+				Map<String, Object> fieldMap = record.get("m").asMap();
 				movie = new Movie();
-				movie.setId(record.get("m").get("id").asString());
-				movie.setName(record.get("m").get("name").asString());
-				// add more properties extraction here.
+				movie.setId((String)fieldMap.get("id"));
+				movie.setName((String)fieldMap.get("name"));
 			}
 			return movie;
 		}
 	}
-	private Driver getDriver() {
+	public Driver getDriver() {
 		return driver;
 	}
 }

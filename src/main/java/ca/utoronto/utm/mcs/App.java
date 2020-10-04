@@ -34,7 +34,7 @@ public class App
     	BaseHandler movieHandler = new MovieRestHandler(connector.getDriver());
     	server.createContext("/api/v1/addMovie", movieHandler);
     	server.createContext("/api/v1/getMovie", movieHandler);
-//    	
+    	
     	BaseHandler relationshipHandler = new ActorMovieRelationshipRestHandler(connector.getDriver());
     	server.createContext("/api/v1/addRelationship", relationshipHandler);
     	server.createContext("/api/v1/hasRelationship", relationshipHandler);

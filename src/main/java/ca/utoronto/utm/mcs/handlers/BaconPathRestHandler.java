@@ -5,6 +5,7 @@ import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.neo4j.driver.Driver;
@@ -26,6 +27,7 @@ public class BaconPathRestHandler extends BaseHandler {
 
 	public BaconPathRestHandler(Driver driver) {
 		super(driver);
+		actorService = new ActorServiceImpl(driver);
 	}
 	
 	@Override
@@ -33,11 +35,8 @@ public class BaconPathRestHandler extends BaseHandler {
 		try {
 			if (r.getRequestMethod().equals("GET")) {
 				handleGet(r);
-			} else if (r.getRequestMethod().equals("POST")) {
-				handlePost(r);
-			}
+			} 
 		} catch (MissingInformationException | JSONException  | NodeAlreadyExistsException | NodeNotExistException e) {
-			e.printStackTrace();
 			r.sendResponseHeaders(400, -1);
 		} catch (NoPathException e) {
 			r.sendResponseHeaders(404, -1);
@@ -56,28 +55,10 @@ public class BaconPathRestHandler extends BaseHandler {
 	
 	@Override
 	public void handleGet(HttpExchange r) throws Exception {
-		ActorService actorService = getActorService();
 		Actor actor = getActor(r);
 		List<ActorMovieRelationship> rels = new ArrayList<>();
-		if (actor.getId() == null)
-			throw new MissingInformationException("Required Information does not exist");
-		actor = actorService.findActorById(actor.getId());
-		if (actor == null)
-			throw new NodeNotExistException("That node does not exist");
-		Actor kevinB = actorService.findActorById(kevinBaconId);
-		if (kevinB == null) 
-			throw new NodeNotExistException("That node does not exist");
-		
-		Integer baconNumber = actorService.computeBaconNumber(actor);
-		
-		if (!actor.getName().equals("Kevin Bacon")) {
-			rels = actorService.computeBaconPath(actor);
-//			for (ActorMovieRelationship rel : rels) {
-//				System.out.println("Actorid: " + rel.getActorID());
-//				System.out.println("Movieid: " + rel.getMovieID());
-//			}
-		}
-		if (rels == null) throw new NoPathException("There does not exist a path to Kevin Bacon");
+		Integer baconNumber = actorService.computeBaconNumber(actor.getId());
+		rels = actorService.computeBaconPath(actor.getId());
 		String response = buildResponse(rels, baconNumber);
 		r.getResponseHeaders().set("Content-Type", "appication/json");
 		r.sendResponseHeaders(200, response.length());
@@ -89,24 +70,20 @@ public class BaconPathRestHandler extends BaseHandler {
 	private String buildResponse(List<ActorMovieRelationship> rels, Integer baconNumber) throws JSONException {
 		JSONObject obj = new JSONObject();
 		obj.accumulate("baconNumber", baconNumber);
+		JSONArray arr = new JSONArray();
 		for (ActorMovieRelationship rel : rels) {
 			JSONObject nested = new JSONObject();
 			nested.accumulate("actorId", rel.getActorID());
 			nested.accumulate("movieId", rel.getMovieID());
-			obj.append("baconPath", nested);
+			arr.put(nested);
 		}
+		obj.put("baconPath", arr);
 		return obj.toString();
 	}
 
 	@Override
-	public void handlePost(HttpExchange r) throws Exception {
+	public void handlePut(HttpExchange r) throws Exception {
 
-	}
-
-	private ActorService getActorService() {
-		if (actorService == null)
-			actorService = new ActorServiceImpl(driver);
-		return actorService;
 	}
 
 	private String buildResponse(Integer baconNumber) throws JSONException {

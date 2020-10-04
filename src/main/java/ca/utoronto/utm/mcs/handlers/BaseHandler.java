@@ -29,23 +29,21 @@ public abstract class BaseHandler implements HttpHandler {
 		try {
 			if (r.getRequestMethod().equals("GET")) {
 				handleGet(r);
-			} else if (r.getRequestMethod().equals("POST")) {
-				handlePost(r);
+			} else if (r.getRequestMethod().equals("PUT")) {
+				handlePut(r);
 			}
 		} catch (MissingInformationException | JSONException  | NodeAlreadyExistsException e) {
 			r.sendResponseHeaders(400, -1);
-			e.printStackTrace();
 		} catch (NodeNotExistException e) {
 			r.sendResponseHeaders(404, -1);
 		} catch (Exception e) {
-			e.printStackTrace();
 			r.sendResponseHeaders(500, -1);
 		}
 	}
 
 	public abstract void handleGet(HttpExchange r) throws Exception;
 	
-	public abstract void handlePost(HttpExchange r) throws Exception;
+	public abstract void handlePut(HttpExchange r) throws Exception;
 	
 	public JSONObject convertRequestToJSON(HttpExchange r) throws IOException, JSONException {
 		String body = Utils.convert(r.getRequestBody());

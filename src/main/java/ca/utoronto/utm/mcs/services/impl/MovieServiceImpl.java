@@ -13,16 +13,13 @@ import ca.utoronto.utm.mcs.services.MovieService;
 public class MovieServiceImpl implements MovieService {
 
 	MovieDAO movieDAO = null;
-	Driver driver;
 	
 	public MovieServiceImpl(Driver driver) {
-		this.driver = driver;
 		movieDAO = new MovieDAO(driver);
 	}
 	
 	@Override
 	public String addMovie(Movie movie) throws Exception {
-		MovieDAO movieDAO = getMovieDAO();
 		if (movie.getName() == null || movie.getId() == null) 
 			throw new MissingInformationException("Required info is missing");
 		Movie existingMovie = movieDAO.findMovieById(movie.getId());
@@ -32,18 +29,14 @@ public class MovieServiceImpl implements MovieService {
 
 	@Override
 	public Movie findMovieById(String movieId) throws Exception {
-		MovieDAO movieDAO = getMovieDAO();
 		if (movieId == null) throw new MissingInformationException("Required information is missing");
 		Movie movie = movieDAO.findMovieById(movieId);
 		if (movie == null) throw new NodeNotExistException("That node does not exist");
-		ActorMovieRelationshipService relationshipService = new ActorMovieRelationshipServiceImpl(driver);
+		ActorMovieRelationshipService relationshipService = new ActorMovieRelationshipServiceImpl(movieDAO.getDriver());
 		movie.getActors().addAll(relationshipService.findActorsByMovieId(movieId));
 		return movie;
 	}
 	
-	private MovieDAO getMovieDAO() {
-		return movieDAO;
-	}
 
 	
 }

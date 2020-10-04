@@ -28,6 +28,7 @@ public class ActorMovieRelationshipRestHandler extends BaseHandler {
 	
 	public ActorMovieRelationshipRestHandler(Driver driver) {
 		super(driver);
+		relationshipService = new ActorMovieRelationshipServiceImpl(driver);
 	}
 	
 	private ActorMovieRelationship getRelationship(HttpExchange r) throws IOException, JSONException {
@@ -43,10 +44,8 @@ public class ActorMovieRelationshipRestHandler extends BaseHandler {
 
 	@Override
 	public void handleGet(HttpExchange r) throws Exception {
-		ActorMovieRelationshipService relationshipService = getRelationshipService();
 		ActorMovieRelationship relationship = getRelationship(r);
 		relationship = relationshipService.getRelationship(relationship);
-		relationship.setHasRelationship(relationship == null ? null : relationship.getActorID() != null && relationship.getMovieID() != null);
 		String response = buildResponse(relationship);
 		r.getResponseHeaders().set("Content-Type", "appication/json");
 		r.sendResponseHeaders(200, response.length());
@@ -56,18 +55,11 @@ public class ActorMovieRelationshipRestHandler extends BaseHandler {
 	}
 
 	@Override
-	public void handlePost(HttpExchange r) throws Exception {
-		ActorMovieRelationshipService relationshipService = getRelationshipService();
+	public void handlePut(HttpExchange r) throws Exception {
 		ActorMovieRelationship relationship = getRelationship(r);
 		relationshipService.addRelationship(relationship);
 		r.sendResponseHeaders(200, -1);
 	}
-	
-	private ActorMovieRelationshipService getRelationshipService() {
-		if (relationshipService == null) relationshipService = new ActorMovieRelationshipServiceImpl(driver);
-		return relationshipService;
-	}
-	
 	
 	private String buildResponse(ActorMovieRelationship relationship) throws JSONException {
 		JSONObject obj = new JSONObject();

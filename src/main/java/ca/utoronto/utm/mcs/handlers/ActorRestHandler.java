@@ -22,7 +22,7 @@ public class ActorRestHandler extends BaseHandler {
 		actorService = new ActorServiceImpl(driver);
 	}
 
-	private Actor getActor(HttpExchange r) throws IOException, JSONException {
+	private Actor getActorFromRequestBody(HttpExchange r) throws IOException, JSONException {
 		JSONObject deserialized = convertRequestToJSON(r);
 		Actor actor = new Actor();
 		if (deserialized.has("name"))
@@ -35,8 +35,7 @@ public class ActorRestHandler extends BaseHandler {
 
 	@Override
 	public void handleGet(HttpExchange r) throws Exception {
-		ActorService actorService = getActorService();
-		Actor actor = getActor(r);
+		Actor actor = getActorFromRequestBody(r);
 		actor = actorService.findActorById(actor.getId());
 		String response = buildResponse(actor);
 		r.getResponseHeaders().set("Content-Type", "appication/json");
@@ -47,15 +46,10 @@ public class ActorRestHandler extends BaseHandler {
 	}
 
 	@Override
-	public void handlePost(HttpExchange r) throws Exception {
-		ActorService actorService = getActorService();
-		Actor actor = getActor(r);
-		actorService.insertActor(actor);
+	public void handlePut(HttpExchange r) throws Exception {
+		Actor actor = getActorFromRequestBody(r);
+		actorService.addActor(actor);
 		r.sendResponseHeaders(200, -1);
-	}
-
-	private ActorService getActorService() {
-		return actorService;
 	}
 
 	private String buildResponse(Actor actor) throws JSONException {

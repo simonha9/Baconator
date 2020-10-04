@@ -4,6 +4,7 @@ import org.junit.Test;
 
 import ca.utoronto.utm.mcs.dao.Neo4jConnector;
 import ca.utoronto.utm.mcs.domain.Actor;
+import ca.utoronto.utm.mcs.exceptions.NodeNotExistException;
 import ca.utoronto.utm.mcs.services.ActorService;
 import ca.utoronto.utm.mcs.services.impl.ActorServiceImpl;
 import junit.framework.Assert;
@@ -20,7 +21,7 @@ public class ActorServiceTest extends TestCase {
 		actor.setId("123");
 		
 		ActorService actorService = new ActorServiceImpl(connector.getDriver());
-		actorService.insertActor(actor);
+		actorService.addActor(actor);
 		
 		Actor responseActorID = actorService.findActorById(actor.getId());
 		
@@ -32,10 +33,13 @@ public class ActorServiceTest extends TestCase {
 		Actor actor = new Actor();
 		actor.setId("-1");
 		actor.setName("not a real name");
-		ActorService actorService = new ActorServiceImpl(connector.getDriver());
-		Actor responseActorID = actorService.findActorById(actor.getId());
-		
-		Assert.assertNull(responseActorID);
+		Actor responseActorID = null;
+		try {
+			ActorService actorService = new ActorServiceImpl(connector.getDriver());
+			responseActorID = actorService.findActorById(actor.getId());
+		} catch (NodeNotExistException e) {
+			Assert.assertNull(responseActorID);
+		}
 	}
 	
 	

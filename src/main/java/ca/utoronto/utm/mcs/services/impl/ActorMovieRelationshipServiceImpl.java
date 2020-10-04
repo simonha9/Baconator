@@ -18,28 +18,24 @@ import ca.utoronto.utm.mcs.services.MovieService;
 public class ActorMovieRelationshipServiceImpl implements ActorMovieRelationshipService {
 
 	ActorMovieRelationshipDAO relationshipDAO = null;
-	Driver driver;
 	
 	public ActorMovieRelationshipServiceImpl(Driver driver) {
-		this.driver = driver;
 		relationshipDAO = new ActorMovieRelationshipDAO(driver);
 	}
 
 	@Override
 	public ActorMovieRelationship addRelationship(ActorMovieRelationship relationship) throws Exception {
-		ActorMovieRelationshipDAO relationshipDAO = getRelationshipDAO();
 		if (relationship.getActorID() == null || relationship.getMovieID() == null) 
 			throw new MissingInformationException("Required info is missing");
 		checkActorExists(relationship.getActorID());
 		checkMovieExists(relationship.getMovieID());
 		ActorMovieRelationship existingRel = relationshipDAO.getRelationship(relationship.getActorID(), relationship.getMovieID());
-		if (existingRel != null) throw new NodeAlreadyExistsException("That relationship already exists");
+		if (existingRel.getHasRelationship()) throw new NodeAlreadyExistsException("That relationship already exists");
 		return relationshipDAO.saveRelationship(relationship);
 	}
 
 	@Override
 	public ActorMovieRelationship getRelationship(ActorMovieRelationship relationship) throws Exception {
-		ActorMovieRelationshipDAO relationshipDAO = getRelationshipDAO();
 		if (relationship.getActorID() == null || relationship.getMovieID() == null) throw new MissingInformationException("Required information is missing");
 		checkActorExists(relationship.getActorID());
 		checkMovieExists(relationship.getMovieID());
@@ -48,28 +44,22 @@ public class ActorMovieRelationshipServiceImpl implements ActorMovieRelationship
 
 	@Override
 	public List<String> findActorsByMovieId(String movieId) throws Exception {
-		ActorMovieRelationshipDAO relationshipDAO = getRelationshipDAO();
 		return relationshipDAO.findActorsByMovieId(movieId);
 	}
 
 	@Override
 	public List<String> findMoviesByActorId(String actorId) throws Exception {
-		ActorMovieRelationshipDAO relationshipDAO = getRelationshipDAO();
 		return relationshipDAO.findMoviesByActorId(actorId);
 	}
 	
-	private ActorMovieRelationshipDAO getRelationshipDAO() {
-		return relationshipDAO;
-	}
-	
 	private void checkActorExists(String actorID) throws Exception {
-		ActorService actorService = new ActorServiceImpl(driver);
+		ActorService actorService = new ActorServiceImpl(relationshipDAO.getDriver());
 		Actor actor = actorService.findActorById(actorID);
 		if (actor == null) throw new NodeNotExistException("That node does not exist");
 	}
 	
 	private void checkMovieExists(String movieID) throws Exception {
-		MovieService movieService = new MovieServiceImpl(driver);
+		MovieService movieService = new MovieServiceImpl(relationshipDAO.getDriver());
 		Movie movie = movieService.findMovieById(movieID);
 		if (movie == null) throw new NodeNotExistException("That node does not exist");
 	}

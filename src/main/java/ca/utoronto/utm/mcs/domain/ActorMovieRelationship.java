@@ -1,6 +1,6 @@
 package ca.utoronto.utm.mcs.domain;
 
-public class ActorMovieRelationship extends BaseDataEntity {
+public class ActorMovieRelationship {
 
 	private String movieID;
 	private String actorID;

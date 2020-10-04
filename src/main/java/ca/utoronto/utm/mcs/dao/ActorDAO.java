@@ -30,7 +30,6 @@ public class ActorDAO {
 		try (Session session = driver.session()) {
 			session.writeTransaction(tx -> tx.run("MERGE (a:actor {name: $name, id: $actorID})",
 					parameters("name", actor.getName(), "actorID", actor.getId())));
-			session.close();
 			return actor.getId();
 		}
 	}
@@ -42,22 +41,21 @@ public class ActorDAO {
 			Result result = session.run(query.withParameters(parameters("actorId", actorId)));
 			if (result.hasNext()) {
 				Record record = result.single();
-				System.out.println();
+				Map<String, Object> fieldMap = record.get("a").asMap();
 				actor = new Actor();
-				actor.setId(record.get("a").get("id").asString());
-				actor.setName(record.get("a").get("name").asString());
-				// add more properties extraction here.
+				actor.setId((String) fieldMap.get("id"));
+				actor.setName((String) fieldMap.get("name"));
 			}
 			return actor;
 		}
 	}
 
-	public Integer computeShortestPath(Actor start, Actor finish) {
+	public Integer computeMinDegreeOfSeperation(String fromId, String toId) {
 		Integer baconNumber = null;
 		try (Session session = getDriver().session()) {
-			Query query = new Query("MATCH (a:actor { id: $startId }), (b:actor { id: $finishId }), "
+			Query query = new Query("MATCH (a:actor { id: $fromId }), (b:actor { id: $toId }), "
 					+ "p = shortestPath((a)-[r:ACTED_IN*]-(b)) " + "RETURN size([m in nodes(p) WHERE m:movie]) as baconNumber");
-			Result result = session.run(query.withParameters(parameters("startId", start.getId(), "finishId", finish.getId())));
+			Result result = session.run(query.withParameters(parameters("fromId", fromId, "toId", toId)));
 			if (result.hasNext()) {
 				baconNumber = result.single().get(0).asInt();
 			}
@@ -65,14 +63,14 @@ public class ActorDAO {
 		}
 	}
 
-	public List<ActorMovieRelationship> computeBaconPath(Actor start, Actor finish) {
+	public List<ActorMovieRelationship> computeShortestPath(String fromId, String toId) {
 		List<ActorMovieRelationship> rels = null;
 		List<Record> recs = null;
 		try (Session session = getDriver().session()) {
-			Query query = new Query("MATCH (a:actor { id: $startId }), (b:actor { id: $finishId }), "
-					+ "p = shortestPath((a)-[*]-(b)) " + "with reverse(nodes(p)) as path " + "unwind path as flatPath "
+			Query query = new Query("MATCH (a:actor { id: $fromId }), (b:actor { id: $toId }), "
+					+ "p = shortestPath((a)-[r:ACTED_IN*]-(b)) " + "with (nodes(p)) as path " + "unwind path as flatPath "
 					+ "RETURN flatPath");
-			Result result = session.run(query.withParameters(parameters("startId", start.getId(), "finishId", finish.getId())));
+			Result result = session.run(query.withParameters(parameters("fromId", fromId, "toId", toId)));
 			if (result.hasNext()) {
 				recs = result.list();
 			}
@@ -96,7 +94,7 @@ public class ActorDAO {
 		}
 	}
 
-	private Driver getDriver() {
+	public Driver getDriver() {
 		return driver;
 	}
 
